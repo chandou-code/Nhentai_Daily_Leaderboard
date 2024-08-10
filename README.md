@@ -1,3 +1,3 @@
 # Nhentai_Daily_Leaderboard
 
-用requests和bs4爬取nhentai的每日本子排行榜并且使用html保存到本地。要挂梯子如果是clash要tun模式，并且设置里的tun堆栈改成system，如果有其他让系统用梯子的方法也行（exe自用，怕就用源码）
+用requests和bs4爬取nhentai的每日本子排行榜封面并且使用html保存到本地。要挂梯子，如果是clash要tun模式，并且设置里的tun堆栈改成system，如果有其他让系统用梯子的方法也行（exe自用，怕就用源码）
