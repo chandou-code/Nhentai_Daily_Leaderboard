@@ -222,6 +222,7 @@ def change_to_location(page):
     write_html_to_file(file_path, updated_html_content)
     print("HTML 内容更新成功。")
 
+
 def location_static(page):
     today = datetime.now().strftime('%Y-%m-%d')
     file_path = os.path.join('nhentais', f'{today}_{page}.html')
@@ -232,7 +233,6 @@ def location_static(page):
 
     html_content = read_html_from_file(file_path)
 
-
     soup = BeautifulSoup(html_content, 'html.parser')
 
     for link in soup.find_all('link'):
@@ -241,23 +241,48 @@ def location_static(page):
             link['href'] = './static/all.min.css'
         elif 'https://static.nhentai.net/css/styles' in href:
             link['href'] = './static/styles.3880fca2c456.css'
+    title = soup.find('title')
+    title.string = file_path
+    print(title)
 
-    # for script in soup.find_all('script'):
-    #     src = script.get('src')
-        # if 'https://static.nhentai.net/js/scripts' in src:
-        #     script['src'] = './static/scripts.ee1fea267e1e.js'
-
-    # 将修改后的 HTML 转换为字符串
     new_html_content = str(soup)
 
-    # 打印或保存新 HTML 内容
-
-    # 将修改后的 HTML 转回字符串
-
-
-    # 保存更新后的 HTML 内容
     write_html_to_file(file_path, new_html_content)
     print("HTML 内容更新成功2。")
+
+def location_next_page(page):
+    today = datetime.now().strftime('%Y-%m-%d')
+    file_path = os.path.join('nhentais', f'{today}_{page}.html')
+    print(file_path)
+    if not os.path.exists(file_path):
+        print("文件未找到")
+        return
+
+    html_content = read_html_from_file(file_path)
+
+
+    # 使用 BeautifulSoup 解析 HTML 内容
+    soup = BeautifulSoup(html_content, 'lxml')
+
+    # 选择 <section> 元素
+    section = soup.find('section', class_='pagination')
+
+    if section:
+        # 遍历所有 <a> 标签
+        for link in section.find_all('a', class_='page'):
+            # 提取文本作为页面号
+            page_number = link.get_text()
+            # 更新 href 属性
+            new_href = f"{today}_{page_number}.html"
+            link['href'] = new_href
+
+        # 打印更新后的 <section> 元素
+        # print("更新后的 <section> 元素：")
+        # print(section.prettify())
+        new_html_content = str(soup)
+        write_html_to_file(file_path, new_html_content)
+    else:
+        print("没有找到 <section> 元素。")
 
 def main():
     page = int(input('页数:'))
@@ -267,13 +292,12 @@ def main():
             tr_main(i + 1)
             change_to_location(i + 1)
             location_static(i + 1)
+            location_next_page(i + 1)
     y = input('end')
 
 
 def debug():
     change_to_location(3)
-
-
 
 
 def tr_main(page):
@@ -283,9 +307,9 @@ def tr_main(page):
     for i in img_tags:
         # lists.append(i)
         data_src = i.get('data-src')
-        dic1={
-            'url':data_src,
-            'page':page
+        dic1 = {
+            'url': data_src,
+            'page': page
         }
         task_queue.put(dic1)
 
@@ -305,9 +329,9 @@ def tr_main(page):
 
 def task_function(img_tag):
     # print(img_tag)
-    page=img_tag['page']
-    url=img_tag['url']
-    data_src =url
+    page = img_tag['page']
+    url = img_tag['url']
+    data_src = url
     # print(data_src)
     #
     print(f"Data-src: {data_src}")
@@ -319,16 +343,26 @@ def task_function(img_tag):
     print('---')  # 分隔不同的 img 和 name 标签
 
 
-
+# def select_page_in_html():
+#     html = read_html_from_file(file_name)
+#     soup = BeautifulSoup(html, 'html.parser')
+#
+#     # 选择所有分页链接
+#     page_links = soup.select('section.pagination a.page')
+#     for link in page_links:
+#         print(link['href'])
+#
+#     # 选择"下一页"链接
+#     next_link = soup.select_one('section.pagination a.next')
+#     if next_link:
+#         print(next_link['href'])
+#
+#     # 选择"最后一页"链接
+#     last_link = soup.select_one('section.pagination a.last')
+#     if last_link:
+#         print(last_link['href'])
 
 
 if __name__ == '__main__':
-    # print(get_detain_picture('https://nhentai.net/g/523641/'))
-    # print(get_html(3))
-    # get_html(1)
-    # tr_main(1)
-    # change_to_location(1)
-    # location_static(1)
-    # location_static(2)
-    # location_static(3)
+    # location_next_page(1)
     main()
